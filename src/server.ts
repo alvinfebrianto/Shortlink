@@ -31,7 +31,7 @@ const server = Bun.serve({
 
         // Validation
         if (!targetUrl) return new Response("URL is required", { status: 400 });
-        if (!/^https?:\/\/ப்புகளை/.test(targetUrl)) {
+        if (!/^https?:\/\//.test(targetUrl)) {
           targetUrl = "https://" + targetUrl;
         }
 
