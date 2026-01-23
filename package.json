@@ -1,0 +1,15 @@
+{
+  "name": "shortlink",
+  "module": "src/server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

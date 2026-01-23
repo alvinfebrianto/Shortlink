@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHRT // LNK</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+    <header>
+        <h1>SHRT // LNK</h1>
+    </header>
+
+    <main>
+        <!-- Creation Form -->
+        <section class="create-section">
+            <form id="create-form">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="url">Target URL</label>
+                        <input type="url" id="url" name="url" placeholder="https://super-long-url.com/xyz..." required>
+                    </div>
+                    <div class="input-group">
+                        <label for="slug">Custom Slug</label>
+                        <input type="text" id="slug" name="slug" placeholder="e.g. 'demo'">
+                    </div>
+                </div>
+                <button type="submit" class="primary-btn">GENERATE SHORTLINK</button>
+            </form>
+            <div id="message" class="message hidden"></div>
+        </section>
+
+        <!-- Search -->
+        <div class="filter-container">
+            <input type="search" id="search" placeholder="SEARCH DIRECTORY...">
+        </div>
+
+        <!-- Directory -->
+        <div id="links-container" class="links-grid">
+            <!-- Links injected via JS -->
+        </div>
+    </main>
+
+    <script src="/public/script.js"></script>
+</body>
+</html>
