@@ -3,6 +3,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageDiv = document.getElementById('message');
     const searchInput = document.getElementById('search');
     const container = document.getElementById('links-container');
+    const themeBtns = document.querySelectorAll('.theme-btn');
+
+    // --- Theme Logic ---
+    const setTheme = (theme) => {
+        // Remove active class from all buttons
+        themeBtns.forEach(btn => btn.classList.remove('active'));
+        // Add active class to selected button
+        document.querySelector(`[data-value="${theme}"]`)?.classList.add('active');
+
+        // Apply theme
+        if (theme === 'auto') {
+            delete document.documentElement.dataset.theme;
+            localStorage.removeItem('theme');
+        } else {
+            document.documentElement.dataset.theme = theme;
+            localStorage.setItem('theme', theme);
+        }
+    };
+
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('theme') || 'auto';
+    setTheme(savedTheme);
+
+    // Theme Button Click Handlers
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTheme(btn.dataset.value);
+        });
+    });
+
+    // Listen for system changes when in auto mode
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) {
+            // Re-trigger auto logic if needed, though CSS handles system pref usually
+            // Here we mainly rely on CSS variables or if we need JS-side logic
+        }
+    });
+
+    // --- End Theme Logic ---
+
 
     // Helper: Show Message
     const showMessage = (text, type) => {

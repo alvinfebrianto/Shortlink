@@ -5,10 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHRT // LNK</title>
     <link rel="stylesheet" href="/public/style.css">
+    <script>
+        // Prevent flash of wrong theme
+        (function() {
+            const theme = localStorage.getItem('theme');
+            if (theme) {
+                document.documentElement.dataset.theme = theme;
+            }
+        })();
+    </script>
 </head>
 <body>
     <header>
-        <h1>SHRT // LNK</h1>
+        <div class="brand-box">
+            <h1>SHRT // LNK</h1>
+        </div>
+        
+        <div class="theme-switcher">
+            <button class="theme-btn" data-value="light">LIGHT</button>
+            <button class="theme-btn" data-value="auto">AUTO</button>
+            <button class="theme-btn" data-value="dark">DARK</button>
+        </div>
     </header>
 
     <main>
