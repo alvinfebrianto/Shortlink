@@ -58,24 +58,6 @@ header {
     gap: 1rem;
 }
 
-.brand-box {
-    border: var(--border-width) solid var(--border-color);
-    background: var(--accent-primary);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
-    transform: rotate(-1deg);
-    width: 100%;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 2.5rem;
-    color: white; /* Keep white for contrast on primary color */
-    text-transform: uppercase;
-    letter-spacing: -1px;
-    text-shadow: 2px 2px 0 var(--border-color);
-}
-
 /* Theme Switcher */
 .theme-switcher {
     display: flex;
