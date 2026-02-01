@@ -53,27 +53,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     };
 
+    // Track timeouts per button to prevent race conditions
+    const copyTimeouts = new WeakMap();
+
     // Helper: Copy to Clipboard with visual feedback
     window.copyToClipboard = async (text, btnElement) => {
+        // Clear any existing timeout for this button
+        if (copyTimeouts.has(btnElement)) {
+            clearTimeout(copyTimeouts.get(btnElement));
+        }
+
         try {
             await navigator.clipboard.writeText(text);
             
             // Visual feedback on the button
-            const originalText = btnElement.textContent;
             btnElement.textContent = 'COPIED!';
             btnElement.classList.add('copied', 'flash');
             
             // Reset after delay
-            setTimeout(() => {
-                btnElement.textContent = originalText;
+            const timeoutId = setTimeout(() => {
+                btnElement.textContent = 'COPY';
                 btnElement.classList.remove('copied', 'flash');
+                copyTimeouts.delete(btnElement);
             }, 1500);
+            
+            copyTimeouts.set(btnElement, timeoutId);
         } catch (err) {
             console.error('Failed to copy:', err);
             btnElement.textContent = 'FAILED';
-            setTimeout(() => {
+            btnElement.classList.remove('copied');
+            btnElement.classList.add('flash');
+            
+            const timeoutId = setTimeout(() => {
                 btnElement.textContent = 'COPY';
+                btnElement.classList.remove('copied', 'flash');
+                copyTimeouts.delete(btnElement);
             }, 1500);
+            
+            copyTimeouts.set(btnElement, timeoutId);
         }
     };
 
