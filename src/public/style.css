@@ -299,9 +299,33 @@ button.primary-btn:active {
 
 .btn-small.copy {
     background: var(--input-bg);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
 }
 .btn-small.copy:hover {
     filter: brightness(0.9);
+}
+.btn-small.copy:active {
+    transform: scale(0.95);
+}
+
+/* Copy button success state */
+.btn-small.copy.copied {
+    background: var(--accent-secondary);
+    color: #1a1a1a;
+    border-color: var(--border-color);
+}
+
+/* Flash animation for copy feedback */
+@keyframes copyFlash {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.btn-small.copy.flash {
+    animation: copyFlash 0.2s ease-out;
 }
 
 /* Utilities */

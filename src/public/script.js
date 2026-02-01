@@ -53,13 +53,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     };
 
-    // Helper: Copy to Clipboard
-    window.copyToClipboard = async (text) => {
+    // Track timeouts per button to prevent race conditions
+    const copyTimeouts = new WeakMap();
+
+    // Helper: Escape HTML to prevent XSS
+    const escapeHtml = (unsafe) => {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    // Module-level variables for search functionality
+    let currentLinks = [];
+
+    // Helper: Copy to Clipboard with visual feedback
+    window.copyToClipboard = async (text, btnElement) => {
+        // Clear any existing timeout for this button
+        if (copyTimeouts.has(btnElement)) {
+            clearTimeout(copyTimeouts.get(btnElement));
+        }
+
         try {
             await navigator.clipboard.writeText(text);
-            alert('Copied to clipboard!');
+            
+            // Visual feedback on the button
+            btnElement.textContent = 'COPIED!';
+            btnElement.classList.add('copied', 'flash');
+            
+            // Reset after delay
+            const timeoutId = setTimeout(() => {
+                btnElement.textContent = 'COPY';
+                btnElement.classList.remove('copied', 'flash');
+                copyTimeouts.delete(btnElement);
+            }, 1500);
+            
+            copyTimeouts.set(btnElement, timeoutId);
         } catch (err) {
             console.error('Failed to copy:', err);
+            btnElement.textContent = 'FAILED';
+            btnElement.classList.remove('copied');
+            btnElement.classList.add('flash');
+            
+            const timeoutId = setTimeout(() => {
+                btnElement.textContent = 'COPY';
+                btnElement.classList.remove('copied', 'flash');
+                copyTimeouts.delete(btnElement);
+            }, 1500);
+            
+            copyTimeouts.set(btnElement, timeoutId);
         }
     };
 
@@ -100,45 +145,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Render function using module-level links data
+    const renderLinks = (filterText = '') => {
+        const filtered = currentLinks.filter(link => 
+            link.url.toLowerCase().includes(filterText) || 
+            link.slug.toLowerCase().includes(filterText)
+        );
+
+        container.innerHTML = filtered.map(link => {
+            const fullUrl = `${window.location.origin}/${link.slug}`;
+            return `
+            <div class="link-card">
+                <div class="card-header">
+                    <span class="slug-badge">/${link.slug}</span>
+                    <span class="click-badge">${link.visits_count} clicks</span>
+                </div>
+                <div class="link-url" title="${escapeHtml(link.url)}">${escapeHtml(link.url)}</div>
+                <div class="card-actions">
+                    <a href="/${link.slug}" target="_blank" class="btn-small visit">VISIT &nearr;</a>
+                    <button onclick="copyToClipboard('${fullUrl}', this)" class="btn-small copy">COPY</button>
+                </div>
+            </div>
+        `}).join('');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; width:100%;">No links found matching criteria.</p>';
+        }
+    };
+
+    // Search event listener - registered only once
+    searchInput.addEventListener('input', (e) => {
+        renderLinks(e.target.value.toLowerCase());
+    });
+
     // Load Links
     async function loadLinks() {
         try {
             const response = await fetch('/api/links');
-            const links = await response.json();
-
-            const render = (filterText = '') => {
-                const filtered = links.filter(link => 
-                    link.url.toLowerCase().includes(filterText) || 
-                    link.slug.toLowerCase().includes(filterText)
-                );
-
-                container.innerHTML = filtered.map(link => {
-                    const fullUrl = `${window.location.origin}/${link.slug}`;
-                    return `
-                    <div class="link-card">
-                        <div class="card-header">
-                            <span class="slug-badge">/${link.slug}</span>
-                            <span class="click-badge">${link.visits_count} clicks</span>
-                        </div>
-                        <div class="link-url" title="${link.url}">${link.url}</div>
-                        <div class="card-actions">
-                            <a href="/${link.slug}" target="_blank" class="btn-small visit">VISIT &nearr;</a>
-                            <button onclick="copyToClipboard('${fullUrl}')" class="btn-small copy">COPY</button>
-                        </div>
-                    </div>
-                `}).join('');
-                
-                if (filtered.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; width:100%;">No links found matching criteria.</p>';
-                }
-            };
-
-            render(searchInput.value.toLowerCase());
-
-            searchInput.addEventListener('input', (e) => {
-                render(e.target.value.toLowerCase());
-            });
-
+            currentLinks = await response.json();
+            renderLinks(searchInput.value.toLowerCase());
         } catch (e) {
             console.error(e);
             container.innerText = 'Failed to load links.';
