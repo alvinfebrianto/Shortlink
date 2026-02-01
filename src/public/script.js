@@ -53,13 +53,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     };
 
-    // Helper: Copy to Clipboard
-    window.copyToClipboard = async (text) => {
+    // Helper: Copy to Clipboard with visual feedback
+    window.copyToClipboard = async (text, btnElement) => {
         try {
             await navigator.clipboard.writeText(text);
-            alert('Copied to clipboard!');
+            
+            // Visual feedback on the button
+            const originalText = btnElement.textContent;
+            btnElement.textContent = 'COPIED!';
+            btnElement.classList.add('copied', 'flash');
+            
+            // Reset after delay
+            setTimeout(() => {
+                btnElement.textContent = originalText;
+                btnElement.classList.remove('copied', 'flash');
+            }, 1500);
         } catch (err) {
             console.error('Failed to copy:', err);
+            btnElement.textContent = 'FAILED';
+            setTimeout(() => {
+                btnElement.textContent = 'COPY';
+            }, 1500);
         }
     };
 
@@ -123,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="link-url" title="${link.url}">${link.url}</div>
                         <div class="card-actions">
                             <a href="/${link.slug}" target="_blank" class="btn-small visit">VISIT &nearr;</a>
-                            <button onclick="copyToClipboard('${fullUrl}')" class="btn-small copy">COPY</button>
+                            <button onclick="copyToClipboard('${fullUrl}', this)" class="btn-small copy">COPY</button>
                         </div>
                     </div>
                 `}).join('');
