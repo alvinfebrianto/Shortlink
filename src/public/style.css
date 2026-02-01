@@ -24,6 +24,19 @@
     --input-bg: #333;
 }
 
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --bg-color: #1a1a1a;
+        --card-bg: #2a2a2a;
+        --text-color: #f0f0f0;
+        --border-color: #f0f0f0;
+        --accent-primary: #a78bfa;
+        --accent-secondary: #34d399;
+        --accent-error: #f87171;
+        --input-bg: #333;
+    }
+}
+
 * {
     box-sizing: border-box;
 }

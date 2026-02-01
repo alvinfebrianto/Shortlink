@@ -36,6 +36,6 @@ src/public/agentation.js
 # Finder (MacOS) folder config
 .DS_Store
 
+.kilocode/
 *.sqlite
-*.md
 AGENTS.md
