@@ -6,7 +6,6 @@
     <title>SHRT // LNK</title>
     <link rel="stylesheet" href="/public/style.css">
     <script>
-        // Prevent flash of wrong theme
         (function() {
             const theme = localStorage.getItem('theme');
             if (theme) {
@@ -25,7 +24,6 @@
     </header>
 
     <main>
-        <!-- Creation Form -->
         <section class="create-section">
             <form id="create-form">
                 <div class="form-grid">
@@ -43,14 +41,11 @@
             <div id="message" class="message hidden"></div>
         </section>
 
-        <!-- Search -->
         <div class="filter-container">
             <input type="search" id="search" placeholder="SEARCH DIRECTORY...">
         </div>
 
-        <!-- Directory -->
         <div id="links-container" class="links-grid">
-            <!-- Links injected via JS -->
         </div>
     </main>
 

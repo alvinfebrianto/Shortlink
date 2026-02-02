@@ -5,14 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('links-container');
     const themeBtns = document.querySelectorAll('.theme-btn');
 
-    // --- Theme Logic ---
     const setTheme = (theme) => {
-        // Remove active class from all buttons
         themeBtns.forEach(btn => btn.classList.remove('active'));
-        // Add active class to selected button
         document.querySelector(`[data-value="${theme}"]`)?.classList.add('active');
 
-        // Apply theme
         if (theme === 'auto') {
             delete document.documentElement.dataset.theme;
             localStorage.removeItem('theme');
@@ -22,29 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initialize Theme
     const savedTheme = localStorage.getItem('theme') || 'auto';
     setTheme(savedTheme);
 
-    // Theme Button Click Handlers
     themeBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             setTheme(btn.dataset.value);
         });
     });
 
-    // Listen for system changes when in auto mode
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (!localStorage.getItem('theme')) {
-            // Re-trigger auto logic if needed, though CSS handles system pref usually
-            // Here we mainly rely on CSS variables or if we need JS-side logic
         }
     });
 
-    // --- End Theme Logic ---
-
-
-    // Helper: Show Message
     const showMessage = (text, type) => {
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
@@ -53,10 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     };
 
-    // Track timeouts per button to prevent race conditions
     const copyTimeouts = new WeakMap();
 
-    // Helper: Escape HTML to prevent XSS
     const escapeHtml = (unsafe) => {
         if (!unsafe) return '';
         return unsafe
@@ -67,12 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, '&#039;');
     };
 
-    // Module-level variables for search functionality
     let currentLinks = [];
 
-    // Helper: Copy to Clipboard with visual feedback
     window.copyToClipboard = async (text, btnElement) => {
-        // Clear any existing timeout for this button
         if (copyTimeouts.has(btnElement)) {
             clearTimeout(copyTimeouts.get(btnElement));
         }
@@ -80,11 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await navigator.clipboard.writeText(text);
             
-            // Visual feedback on the button
             btnElement.textContent = 'COPIED!';
             btnElement.classList.add('copied', 'flash');
             
-            // Reset after delay
             const timeoutId = setTimeout(() => {
                 btnElement.textContent = 'COPY';
                 btnElement.classList.remove('copied', 'flash');
@@ -108,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Create Link
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
@@ -130,9 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
                 loadLinks();
             } else {
-                const err = await res.text(); // or res.json() depending on server
-                // The server currently returns text for errors like "Slug already exists"
-                // but let's be safe.
+                const err = await res.text();
                 try {
                      const jsonErr = JSON.parse(err);
                      showMessage(jsonErr.message || "Error creating link", 'error');
@@ -145,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Render function using module-level links data
     const renderLinks = (filterText = '') => {
         const filtered = currentLinks.filter(link => 
             link.url.toLowerCase().includes(filterText) || 
@@ -173,12 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Search event listener - registered only once
     searchInput.addEventListener('input', (e) => {
         renderLinks(e.target.value.toLowerCase());
     });
 
-    // Load Links
     async function loadLinks() {
         try {
             const response = await fetch('/api/links');

@@ -2,7 +2,6 @@ import { Database } from "bun:sqlite";
 
 const db = new Database("shortlink.sqlite");
 
-// Initialize tables
 db.run(`
   CREATE TABLE IF NOT EXISTS links (
     slug TEXT PRIMARY KEY,

@@ -17,25 +17,21 @@ const server = Bun.serve({
     const url = new URL(req.url);
     const method = req.method;
 
-    // API: List Links
     if (method === "GET" && url.pathname === "/api/links") {
       const links = DB.getAllLinks();
       return Response.json(links);
     }
 
-    // API: Create Link
     if (method === "POST" && url.pathname === "/api/links") {
       try {
         const body = await req.json();
         let { slug, url: targetUrl } = body;
 
-        // Validation
         if (!targetUrl) return new Response("URL is required", { status: 400 });
         if (!/^https?:\/\//.test(targetUrl)) {
           targetUrl = "https://" + targetUrl;
         }
 
-        // Generate slug if not provided
         if (!slug) {
           let attempts = 0;
           do {
@@ -43,7 +39,6 @@ const server = Bun.serve({
             attempts++;
           } while (DB.linkExists(slug) && attempts < 10);
         } else {
-            // Validate custom slug
             if (!/^[a-z0-9-_]+$/i.test(slug)) {
                 return new Response("Invalid slug format", { status: 400 });
             }
@@ -59,12 +54,10 @@ const server = Bun.serve({
       }
     }
 
-    // Serve Frontend
     if (method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
       return new Response(Bun.file("src/index.html"));
     }
 
-    // Serve Static Assets
     if (method === "GET" && url.pathname.startsWith("/public/")) {
       const filePath = `src${url.pathname}`;
       const file = Bun.file(filePath);
@@ -73,18 +66,15 @@ const server = Bun.serve({
       }
     }
 
-    // Redirect Logic
-    const slug = url.pathname.slice(1); // Remove leading slash
+    const slug = url.pathname.slice(1);
     if (slug && /^[a-z0-9-_]+$/i.test(slug)) {
       const link = DB.getLink(slug);
       if (link) {
-        // Log visit asynchronously
         DB.logVisit(slug, req.headers.get("User-Agent"), req.headers.get("Referer"));
         return Response.redirect(link.url, 302);
       }
     }
 
-    // 404 Fallback
     const notFoundPage = Bun.file("src/404.html");
     if (await notFoundPage.exists()) {
       return new Response(notFoundPage, { status: 404, headers: { "Content-Type": "text/html" } });
